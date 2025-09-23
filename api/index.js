@@ -2,57 +2,70 @@ import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
 const app = express();
-app.use(cors());
+const prisma = new PrismaClient();
+
 app.use(express.json());
 
-// Перевірка підключення до бази даних
-async function checkDatabaseConnection() {
-  try {
-    await prisma.$connect();
-    console.log('Successfully connected to Neon PostgreSQL');
-  } catch (error) {
-    console.error('Failed to connect to Neon PostgreSQL:', error);
-    process.exit(1); // Завершуємо процес із помилкою
-  }
-}
+// Дозволяємо CORS для фронтенду
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept'],
+}));
 
-// API: Отримати контент
+// Отримання даних головної сторінки
 app.get('/api/homepage', async (req, res) => {
   try {
     const homepage = await prisma.homepage.findFirst();
-    res.json(homepage || { title: 'Welcome to My Store', description: 'Best products for you!' });
+    res.json(homepage || { title: 'Default Title', description: 'Default Description' });
   } catch (error) {
     console.error('Error fetching homepage:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Failed to fetch homepage' });
   }
 });
 
-// API: Оновити контент
+// Оновлення даних головної сторінки
 app.put('/api/homepage', async (req, res) => {
+  const { title, description } = req.body;
   try {
-    const { title, description } = req.body;
     const homepage = await prisma.homepage.upsert({
       where: { id: 1 },
-      update: { title, description, updatedAt: new Date() },
-      create: { id: 1, title, description, updatedAt: new Date() },
+      update: { title, description },
+      create: { title, description },
     });
     res.json(homepage);
   } catch (error) {
     console.error('Error updating homepage:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Failed to update homepage' });
   }
 });
 
-// Для локального тестування
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  checkDatabaseConnection().then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  });
-}
+// Отримання всіх продуктів
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await prisma.product.findMany();
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
 
-export default app;
+// Створення нового продукту
+app.post('/api/products', async (req, res) => {
+  const { name, price } = req.body;
+  try {
+    const product = await prisma.product.create({
+      data: { name, price },
+    });
+    res.json(product);
+  } catch (error) {
+    console.error('Error creating product:', error);
+    res.status(500).json({ error: 'Failed to create product' });
+  }
+});
+
+app.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
+});

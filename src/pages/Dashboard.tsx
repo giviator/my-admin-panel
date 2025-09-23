@@ -14,21 +14,26 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [productName, setProductName] = useState('');
   const [productPrice, setProductPrice] = useState('');
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    axios.get('/api/homepage')
+    axios.get('http://localhost:3000/api/homepage')
       .then(response => {
         setTitle(response.data.title || 'Default Title');
         setDescription(response.data.description || 'Default Description');
       })
-      .catch(() => toast.error('Помилка завантаження'));
+      .catch(() => toast.error('Помилка завантаження homepage'));
+
+    axios.get('http://localhost:3000/api/products')
+      .then(response => setProducts(response.data))
+      .catch(() => toast.error('Помилка завантаження продуктів'));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.put('/api/homepage', { title, description });
+      await axios.put('http://localhost:3000/api/homepage', { title, description });
       toast.success('Зміни збережено!');
     } catch {
       toast.error('Помилка збереження');
@@ -39,10 +44,15 @@ const Dashboard: React.FC = () => {
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('/api/products', { name: productName, price: parseFloat(productPrice) });
+      await axios.post('http://localhost:3000/api/products', {
+        name: productName,
+        price: parseFloat(productPrice),
+      });
       toast.success('Товар додано!');
       setProductName('');
       setProductPrice('');
+      const response = await axios.get('http://localhost:3000/api/products');
+      setProducts(response.data);
     } catch {
       toast.error('Помилка додавання товару');
     }
@@ -112,6 +122,20 @@ const Dashboard: React.FC = () => {
             Додати товар
           </button>
         </form>
+      </Card>
+      <Card className="mt-6">
+        <h2 className="text-xl font-semibold mb-4">Список товарів</h2>
+        {products.length > 0 ? (
+          <ul>
+            {products.map((product: any) => (
+              <li key={product.id} className="py-2">
+                <span>{product.name} - ${product.price}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-600">Немає товарів.</p>
+        )}
       </Card>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <Card><LineChart data={chartData} /></Card>
