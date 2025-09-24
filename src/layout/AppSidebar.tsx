@@ -14,6 +14,9 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  DocsIcon,
+  BoxIcon,
+  FolderIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
@@ -40,6 +43,21 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "Профіль користувача",
     path: "/profile",
+  },
+  {
+    icon: <BoxIcon />,
+    name: "Товари",
+    path: "/products",
+  },
+  {
+    icon: <FolderIcon />,
+    name: "Дерево пошуку",
+    path: "/search-tree",
+  },
+  {
+    icon: <DocsIcon />,
+    name: "Робота з сайтом",
+    subItems: [{ name: "Каталоги", path: "/website-management", pro: false }],
   },
   {
     name: "Форми",
@@ -116,7 +134,7 @@ const AppSidebar: React.FC = () => {
     ["main", "others"].forEach((menuType) => {
       const items = menuType === "main" ? navItems : othersItems;
       items.forEach((nav, index) => {
-        if (nav.subItems) {
+        if (nav.subItems && Array.isArray(nav.subItems)) {
           nav.subItems.forEach((subItem) => {
             if (isActive(subItem.path)) {
               setOpenSubmenu({

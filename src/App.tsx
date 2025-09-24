@@ -3,6 +3,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import DefaultLayout from './layout/DefaultLayout';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import Products from './pages/Products';
+import SearchTree from './pages/SearchTree';
+import WebsiteManagement from './pages/WebsiteManagement/WebsiteManagement';
 import SignIn from './pages/AuthPages/SignIn';
 import SignUp from './pages/AuthPages/SignUp';
 import ErrorPage from './pages/ErrorPage';
@@ -22,6 +25,18 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <Profile />,
+      },
+      {
+        path: 'products',
+        element: <Products />,
+      },
+      {
+        path: 'search-tree',
+        element: <SearchTree />,
+      },
+      {
+        path: 'website-management',
+        element: <WebsiteManagement />,
       },
     ],
   },

@@ -47,6 +47,16 @@ const Sidebar: React.FC = () => {
               Register
             </NavLink>
           </li>
+          <li className="mb-2">
+            <NavLink
+              to="/products"
+              className={({ isActive }) =>
+                isActive ? 'block p-2 bg-blue-600 rounded' : 'block p-2 hover:bg-gray-700 rounded'
+              }
+            >
+              Товари
+            </NavLink>
+          </li>
         </ul>
       </nav>
     </div>
